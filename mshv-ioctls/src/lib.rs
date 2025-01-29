@@ -203,6 +203,7 @@ mod ioctls;
 pub use ioctls::device::DeviceFd;
 pub use ioctls::system::Mshv;
 pub use ioctls::vcpu::VcpuFd;
+pub use ioctls::vm::new_vmfd;
 pub use ioctls::vm::InterruptRequest;
 pub use ioctls::vm::IoEventAddress;
 pub use ioctls::vm::NoDatamatch;
