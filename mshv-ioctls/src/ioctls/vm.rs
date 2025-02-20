@@ -13,10 +13,13 @@ use std::cmp;
 use std::convert::TryFrom;
 use std::fs::File;
 
+// use ::std::sync::atomic::{AtomicUsize, Ordering};
 use std::os::unix::io::{AsRawFd, FromRawFd, RawFd};
 use vmm_sys_util::errno;
 use vmm_sys_util::eventfd::EventFd;
 use vmm_sys_util::ioctl::{ioctl, ioctl_with_mut_ref, ioctl_with_ref};
+
+// static CALL_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// Batch size for processing page access states
 const PAGE_ACCESS_STATES_BATCH_SIZE: u64 = 0x10000;
