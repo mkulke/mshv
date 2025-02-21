@@ -189,11 +189,35 @@ impl VmFd {
 
     /// Creates/removes a guest memory mapping to userspace
     pub fn set_guest_memory(&self, user_memory_region: mshv_user_mem_region) -> Result<()> {
+        println!("[mgns-mshv-ioctls] set_guest_memory (enabled)");
+        println!(
+            "[mgns-mshv-ioctls]   guest_pfn:      {:#010x}",
+            user_memory_region.guest_pfn
+        );
+        println!(
+            "[mgns-mshv-ioctls]   size:           {:#010x}",
+            user_memory_region.size
+        );
+        println!(
+            "[mgns-mshv-ioctls]   userspace_addr: {:#018x}",
+            user_memory_region.userspace_addr
+        );
+        println!(
+            "[mgns-mshv-ioctls]   rsvd:           {:?}",
+            user_memory_region.rsvd
+        );
+        println!(
+            "[mgns-mshv-ioctls]   flags:          {:#06x}",
+            user_memory_region.flags
+        );
+
+        // Ok(())
         // SAFETY: IOCTL with correct types
         let ret = unsafe { ioctl_with_ref(self, MSHV_SET_GUEST_MEMORY(), &user_memory_region) };
         if ret == 0 {
             Ok(())
         } else {
+            println!("[mgns-mshv-ioctls] ioctl failed: {}", errno::Error::last());
             Err(errno::Error::last().into())
         }
     }
