@@ -252,11 +252,25 @@ impl VmFd {
             vector: request.vector,
             ..Default::default()
         };
+
+        // unsafe {
+        //     if request.apic_id != 0 {
+        //         let x = CALL_COUNT.fetch_add(1, Ordering::SeqCst);
+        //         if x < 3 {
+        //             println!("mgns: request_virtual_interrupt:");
+        //             println!("  control.as_uint64: {}", interrupt_arg.control.as_uint64);
+        //             println!("  dest_addr: {}", request.apic_id);
+        //             println!("  vector: {}", request.vector);
+        //         }
+        //     }
+        // }
+
         // SAFETY: IOCTL with correct types
         let ret = unsafe { ioctl_with_ref(&self.vm, MSHV_ASSERT_INTERRUPT(), &interrupt_arg) };
         if ret == 0 {
             Ok(())
         } else {
+            println!("mgns: ioctl failed");
             Err(errno::Error::last().into())
         }
     }
@@ -461,8 +475,19 @@ impl VmFd {
     /// vm.set_msi_routing(&msi_routing).unwrap();
     /// ```
     pub fn set_msi_routing(&self, msi_routing: &mshv_user_irq_table) -> Result<()> {
+        unsafe {
+            println!("mgns: set_msi_routing table: {:?}", msi_routing);
+            let n = msi_routing.nr as usize;
+            for i in 0..n {
+                println!("\t{i} => {:?}", msi_routing.entries.as_slice(n)[i]);
+            }
+        }
+
         // SAFETY: we allocated the structure and we know the kernel
         // will read exactly the size of the structure.
+        //
+        //
+        //
         let ret = unsafe { ioctl_with_ref(self, MSHV_SET_MSI_ROUTING(), msi_routing) };
         if ret == 0 {
             Ok(())
@@ -505,6 +530,8 @@ impl VmFd {
         // SAFETY: we know that our file is a VM fd, we know the kernel will only read the
         // correct amount of memory from our pointer, and we verify the return result.
         let ret = unsafe { ioctl_with_ref(self, MSHV_IOEVENTFD(), &ioeventfd) };
+        println!("mgns: ioeventfd: {:?}", ioeventfd);
+
         if ret == 0 {
             Ok(())
         } else {
