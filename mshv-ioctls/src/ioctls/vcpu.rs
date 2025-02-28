@@ -48,6 +48,13 @@ pub struct VcpuFd {
     vcpu: File,
 }
 
+impl VcpuFd {
+    /// temp function to create a new VcpuFd
+    pub fn new_mgns(index: u32, vcpu: File) -> Self {
+        VcpuFd { index, vcpu }
+    }
+}
+
 /// Helper function to create a new `VcpuFd`.
 ///
 /// This should not be exported as a public function because the preferred way is to use
